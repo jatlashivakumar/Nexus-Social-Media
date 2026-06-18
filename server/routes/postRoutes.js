@@ -1,0 +1,20 @@
+import { Router } from 'express';
+import { createPost, getFeed, getExplorePosts, getPost, toggleLike, addComment, deleteComment, toggleSave, deletePost, getUserPosts, searchPosts } from '../controllers/postController.js';
+import { protect, optionalAuth } from '../middleware/authMiddleware.js';
+import { handleUpload, uploadPostImages } from '../middleware/uploadMiddleware.js';
+import { validatePost } from '../validators/postValidator.js';
+
+const router = Router();
+router.get('/explore',       optionalAuth, getExplorePosts);
+router.get('/search',        optionalAuth, searchPosts);
+router.get('/user/:username',optionalAuth, getUserPosts);
+router.use(protect);
+router.get('/feed',          getFeed);
+router.post('/',             handleUpload(uploadPostImages), validatePost('createPost'), createPost);
+router.post('/:id/like',     toggleLike);
+router.post('/:id/save',     toggleSave);
+router.post('/:id/comments', validatePost('addComment'), addComment);
+router.delete('/:id/comments/:commentId', deleteComment);
+router.delete('/:id',        deletePost);
+router.get('/:id',           optionalAuth, getPost);
+export default router;
